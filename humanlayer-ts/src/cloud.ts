@@ -68,13 +68,15 @@ class CloudFunctionCallStore implements AgentStore<FunctionCall, FunctionCallSta
   }
 
   async respond(call_id: string, status: FunctionCallStatus): Promise<FunctionCall> {
+    const functionCall = await this.get(call_id);
+    
     const resp = await this.connection.request({
       method: 'POST',
       path: `/agent/function_calls/${call_id}/respond`,
       body: status,
-    })
-    const data = await resp.json()
-    return data as FunctionCall
+    });
+    const data = await resp.json();
+    return data as FunctionCall;
   }
 }
 

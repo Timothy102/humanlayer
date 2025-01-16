@@ -1,41 +1,59 @@
-## Humanlayer Cookbooks and Examples
+<div align="center">
+    <h2>HumanLayer Cookbooks and Examples</h2>
+</div>
 
-### Basics and hello-world-y things
+<h3>Email Classification with Async Human Review</h3>
 
-The most basic examples are:
+<p>The <code>ts_email_classifier/03-human-review-async.ts</code> file demonstrates an advanced implementation of email classification with asynchronous human review capabilities. This example showcases the parallel processing of multiple emails and the integration of real-time human feedback.</p>
 
-- [openai_client](./openai_client) - basic example of HumanLayer using raw OpenAI client and function calling.
-- [langchain](./langchain) - basic langchain examples, includes the most complete set of examples including `human as tool` and `email` channel features
-- [controlflow](./controlflow) - basic controlflow example
-- [crewai](./crewai) - basic crewai example
-- [fastapi](./fastapi) - basic fastapi server showcasing `AsyncHumanLayer` for asyncio apps
-- [curl](./curl) - interact with the HumanLayer API using curl
+<h4>Key Features</h4>
+<ul>
+    <li><strong>Parallel Processing</strong>: Processes multiple emails simultaneously using <code>Promise.all</code>.</li>
+    <li><strong>Database Integration</strong>: Tracks classification requests in a local SQLite database.</li>
+    <li><strong>Webhook Support</strong>: Enables real-time updates via webhook notifications.</li>
+</ul>
 
-### More advanced examples
+<h4>Prerequisites</h4>
+<ol>
+    <li><strong>Node.js</strong> and <strong>npm</strong> installed.</li>
+    <li><strong>HumanLayer API key</strong> set in <code>.env</code>.</li>
+    <li><strong>Webhook URL</strong> configured (e.g., using ngrok for local development).</li>
+    <li><strong>Slack workspace</strong> configured (optional).</li>
+</ol>
 
-These examples include more end-to-end API examples, using webservers like flask and fastapi, and using some more advanced [state management](https://humanlayer.dev/docs/core/state-management) techniques.
+<h3>Setup and Running</h3>
 
-- [openai_client/03-imperative_fetch.py](./openai_client/03-imperative_fetch.py) - showing how you can use lower-level SDK methods to interact with the HumanLayer API.
-- [fastapi-webhooks](./fastapi-webhooks) - fastapi server that leverage humanlayer webhooks (e.g. with ngrok locally) to fire-and-forget function calls, and handle human approval events as they are received
-- [fastapi-email](./fastapi-email) - two end-to-end examples of a workflow designed to be initiated via email, where approvals and requests from the agents are sent as replies on the same email thread. Includes two versions:
-  - one where the fastapi server manages state
-  - one where the fastapi server leverages the `HumanLayer` state management to manage state
+<ol>
+    <li><strong>Navigate to the project directory</strong>:
+        <pre><code>cd ts_email_classifier</code></pre>
+    </li>
 
-### TypeScript examples
+    <li><strong>Install dependencies</strong>:
+        <pre><code>npm install</code></pre>
+    </li>
 
-- [ts_openai_client](./ts_openai_client) - basic example of HumanLayer using raw OpenAI client and function calling
-- [ts_vercel_ai_sdk](./ts_vercel_ai_sdk) - example showcasing HumanLayer + Vercel AI SDK
-- [ts_langchain](./ts_langchain) - basic example of HumanLayer using LangchainJS
-- [ts_email_classifier](./ts_email_classifier) - basic example of various classification/labeling workflows, using an llm to label emails and then providing sync or async mechanisms for human input on classifications
+    <li><strong>Set up environment variables</strong>:
+        <pre><code>cp .env.example .env</code></pre>
+    </li>
 
-### Other LLMs
+    <li><strong>Run the human review script</strong>:
+        <pre><code>npm run human-review-async</code></pre>
+    </li>
+</ol>
 
-- [crewai-mistral](./crewai-mistral)
-- [langchain-anthropic](./langchain-anthropic)
-- [langchain-ollama](./langchain-ollama)
+<h4>How It Works</h4>
+<ol>
+    <li>The script loads two sample emails from <code>common.ts</code>.</li>
+    <li>Each email is classified by a language model (LLM).</li>
+    <li>Classification requests are sent to human reviewers in parallel.</li>
+    <li>Results are stored in a local database.</li>
+    <li>Webhook notifications are sent when classifications are reviewed.</li>
+</ol>
 
-### Other Frameworks
-
-- [chainlit](./chainlit) is a python-only ui framework for building chat apps
-- [griptape](./griptape) is an agent orchestration and workflow framework
-- [flask](./flask) - basic flask server showcasing `HumanLayer` for sync apps
+<h4>Monitoring</h4>
+<ul>
+    <li>Check the console output for classification progress.</li>
+    <li>Monitor the database for request statuses.</li>
+    <li>Watch the Slack channel for incoming review requests.</li>
+    <li>Webhook endpoints receive real-time updates.</li>
+</ul>

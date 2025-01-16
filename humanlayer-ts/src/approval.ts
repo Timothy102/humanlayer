@@ -316,11 +316,45 @@ ${kwargs.length ? ' with args: ' + JSON.stringify(kwargs, null, 2) : ''}`)
       throw new HumanLayerException('createFunctionCall requires a backend')
     }
     const callId = this.genid('call')
-    return this.backend.functions().add({
+  
+    // Create the function call
+    const functionCall = await this.backend.functions().add({
       run_id: this.runId,
       call_id: callId,
       spec: spec,
-    })
+    });
+  
+    // Send webhook immediately if webhook URL is provided
+    if (typeof spec.webhook_url === 'string' && spec.webhook_url.trim() !== '') {
+      if (this.verbose) {
+        logger.info(`HumanLayer: Sending webhook for call ${callId}`);
+        console.log("Webhook URL from respond", spec.webhook_url)
+      }
+  
+      try {
+        const webhookUrl = spec.webhook_url as string;
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-HumanLayer-Call-ID': callId
+          },
+          body: JSON.stringify({
+            function_call_id: callId,
+            // You may want to include additional data here if needed
+            function_call: functionCall
+          })
+        });
+
+        if (this.verbose) {
+          logger.info(`HumanLayer: Successfully sent webhook for call ${callId}`);
+        }
+      } catch (error) {
+        logger.error(`HumanLayer: Failed to send webhook for call ${callId}:`, error);
+      }
+    }
+  
+    return functionCall;
   }
 
   async getFunctionCall(call_id: string): Promise<FunctionCall> {

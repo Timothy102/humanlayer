@@ -12,41 +12,59 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.post('/webhook', async (req, res) => {
-    console.log('Received webhook:', req.body);
+    console.log('Received webhook:', JSON.stringify(req.body, null, 2));
     
-    const { function_call_id: id, approved, reject_option_name, comment } = req.body;
+    const { function_call_id: id, function_call } = req.body;
+    const { approved, reject_option_name, comment } = function_call?.status || {};
+    const kwargs = function_call?.spec?.kwargs;
+    
+    console.log('kwargs:', JSON.stringify(kwargs, null, 2));
     
     try {
-      const classification = await db.getClassification(id);
+      let classification = await db.getClassification(id);
+      
+      // Create new classification if not found
       if (!classification) {
-        console.error(`Classification not found: ${id}`, {
-          body: req.body,
-          timestamp: new Date().toISOString()
-        });
-        return res.status(404).json({ error: 'Classification not found' });
+        if (!kwargs?.to || !kwargs?.from || !kwargs?.subject || !kwargs?.body || !kwargs?.classification) {
+          console.error(`Missing required fields for new classification`, {
+            kwargs,
+            timestamp: new Date().toISOString()
+          });
+          return res.status(400).json({ error: 'Missing required fields for new classification' });
+        }
+        
+        const email = {
+          to: kwargs.to,
+          from: kwargs.from,
+          subject: kwargs.subject,
+          body: kwargs.body
+        };
+        
+        await db.createClassification(id, email, kwargs.classification);
+        classification = await db.getClassification(id);
       }
 
-    const humanClassification = approved ? 
-      classification.ai_classification : 
-      (reject_option_name as Classification);
+      const humanClassification = approved ? 
+        classification.ai_classification : 
+        (reject_option_name as Classification);
 
-    await db.updateClassification(
-      id,
-      humanClassification,
-      comment
-    );
+      await db.updateClassification(
+        id,
+        humanClassification,
+        comment
+      );
 
-    console.log(`Updated classification ${id}:`, {
-      original: classification.ai_classification,
-      human: humanClassification,
-      comment
-    });
+      console.log(`Updated classification ${id}:`, {
+        original: classification.ai_classification,
+        human: humanClassification,
+        comment
+      });
 
-    res.json({ status: 'success' });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+      res.json({ status: 'success' });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // API Routes

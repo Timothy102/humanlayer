@@ -60,6 +60,7 @@ type FunctionCallSpec = {
   reject_options?: ResponseOption[]
   // Optional state to be preserved across the request lifecycle
   state?: Record<string, any>
+  webhook_url?: string
 }
 
 type FunctionCall = {

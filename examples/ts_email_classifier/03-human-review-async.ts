@@ -53,12 +53,7 @@ async function main() {
           webhook_url: process.env.WEBHOOK_URL
         }
       });
-
-      await db.createClassification(
-        functionCall.call_id,
-        { to, from, subject, body },
-        classification
-      );
+      console.log(functionCall)
     }));
   
     console.log("\nAll classification requests initiated!");
