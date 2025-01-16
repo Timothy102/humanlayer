@@ -5,9 +5,13 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
+    "start": "tsx server.ts",
     "build": "tsc",
     "no-humans": "tsx --env-file=.env 01-no-humans.ts",
-    "human-review-sync": "tsx --env-file=.env 02-human-review-sync.ts"
+    "human-review-sync": "tsx --env-file=.env 02-human-review-sync.ts",
+    "human-review-async": "tsx --env-file=.env 03-human-review-async.ts",
+    "human-review-db": "tsx --env-file=.env 04-human-review-db.ts",
+    "webhook-server": "tsx --env-file=.env webhook-server.ts"
   },
   "repository": {
     "type": "git",
@@ -25,8 +29,10 @@
     "@types/express": "^5.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "humanlayer": "0.7.1",
-    "openai": "^4.0.0"
+    "humanlayer": "0.7.2-dev",
+    "openai": "^4.0.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
